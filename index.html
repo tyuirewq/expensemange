@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker | Manage Daily Expenses</title>
+    <title>Expense Tracker | Multi-User</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
@@ -184,6 +184,58 @@
             color: #10b981;
             font-weight: bold;
         }
+        
+        .user-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        
+        .user-option {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .user-option:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+        
+        .user-option.active {
+            border-color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .password-toggle:hover {
+            color: #374151;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -198,182 +250,264 @@
         <span>Data Updated!</span>
     </div>
     
-    <!-- Main Container -->
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-        <!-- Header -->
-        <header class="mb-10">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Expense Tracker <span class="currency-symbol">(₹)</span></h1>
-                    <p class="text-gray-600 mt-2">Manage your daily expenses efficiently</p>
+    <!-- Login Screen -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-container">
+            <div class="card p-8 bg-white">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800">Expense Tracker</h1>
+                    <p class="text-gray-600 mt-2">Sign in to manage your expenses</p>
                 </div>
-                <div class="flex space-x-3">
-                    <button id="export-data" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 flex items-center">
-                        <i class="fas fa-download mr-2"></i> Export
+                
+                <!-- User Selection -->
+                <div class="mb-6">
+                    <p class="text-gray-700 font-medium mb-3">Select User Account:</p>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="user-option p-4 rounded-lg border text-center" data-user="user1">
+                            <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-user text-blue-600 text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">User 1</h3>
+                            <p class="text-sm text-gray-600">Personal Account</p>
+                        </div>
+                        <div class="user-option p-4 rounded-lg border text-center" data-user="user2">
+                            <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-user text-purple-600 text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">User 2</h3>
+                            <p class="text-sm text-gray-600">Shared Account</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 text-sm font-medium mb-2">Username</label>
+                        <input type="text" id="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Enter username" required readonly>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none pr-10" placeholder="Enter password" required>
+                            <span class="password-toggle" id="toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Default password: <span id="default-password">password123</span></p>
+                    </div>
+                    
+                    <div class="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-blue-700 text-sm">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Each user has separate expense data. Data is stored locally in your browser.
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="w-full btn-primary py-3">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Sign In
                     </button>
-                    <button id="import-data" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center">
-                        <i class="fas fa-upload mr-2"></i> Import
-                    </button>
-                    <button id="refresh-data" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 flex items-center">
-                        <i class="fas fa-sync-alt mr-2"></i> Refresh
-                    </button>
-                </div>
-            </div>
-            <div class="flex items-center justify-between mt-6">
-                <div>
-                    <span class="text-sm text-gray-500" id="current-date"></span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-600">Balance:</span>
-                    <span class="text-xl font-bold text-gray-800" id="balance-amount">₹0.00</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <!-- This Month Income -->
-            <div class="card p-6 income-bg">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm">This Month Income</p>
-                        <p class="text-2xl font-bold income-text mt-2" id="month-income">₹0.00</p>
-                        <p class="text-xs text-gray-500 mt-1">From <span id="month-income-count">0</span> deposits</p>
-                    </div>
-                    <div class="bg-white p-3 rounded-full">
-                        <i class="fas fa-arrow-down text-xl income-text"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- This Month Expenses -->
-            <div class="card p-6 expense-bg">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm">This Month Expenses</p>
-                        <p class="text-2xl font-bold expense-text mt-2" id="month-expense">₹0.00</p>
-                        <p class="text-xs text-gray-500 mt-1">From <span id="month-expense-count">0</span> expenses</p>
-                    </div>
-                    <div class="bg-white p-3 rounded-full">
-                        <i class="fas fa-arrow-up text-xl expense-text"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- This Week Income -->
-            <div class="card p-6 bg-white">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm">This Week Income</p>
-                        <p class="text-2xl font-bold income-text mt-2" id="week-income">₹0.00</p>
-                        <p class="text-xs text-gray-500 mt-1">Last 7 days</p>
-                    </div>
-                    <div class="bg-blue-50 p-3 rounded-full">
-                        <i class="fas fa-calendar-week text-xl text-blue-500"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- This Week Expenses -->
-            <div class="card p-6 bg-white">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm">This Week Expenses</p>
-                        <p class="text-2xl font-bold expense-text mt-2" id="week-expense">₹0.00</p>
-                        <p class="text-xs text-gray-500 mt-1">Last 7 days</p>
-                    </div>
-                    <div class="bg-blue-50 p-3 rounded-full">
-                        <i class="fas fa-calendar-week text-xl text-blue-500"></i>
-                    </div>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Your data is secure and private to your account
+                    </p>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <!-- Main Application (Hidden until login) -->
+    <div id="main-app" class="hidden">
+        <!-- Main Container -->
+        <div class="container mx-auto px-4 py-8 max-w-6xl">
+            <!-- Header -->
+            <header class="mb-10">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="flex items-center">
+                            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Expense Tracker <span class="currency-symbol">(₹)</span></h1>
+                            <div class="ml-4 user-badge flex items-center" id="user-badge">
+                                <i class="fas fa-user mr-2"></i>
+                                <span id="current-user">User 1</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mt-2">Manage your daily expenses efficiently</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button id="change-password-btn" class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 flex items-center">
+                            <i class="fas fa-key mr-2"></i> Change Password
+                        </button>
+                        <button id="export-data" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 flex items-center">
+                            <i class="fas fa-download mr-2"></i> Export
+                        </button>
+                        <button id="import-data" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center">
+                            <i class="fas fa-upload mr-2"></i> Import
+                        </button>
+                        <button id="logout-btn" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 flex items-center">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-6">
+                    <div>
+                        <span class="text-sm text-gray-500" id="current-date"></span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">Balance:</span>
+                        <span class="text-xl font-bold text-gray-800" id="balance-amount">₹0.00</span>
+                    </div>
+                </div>
+            </header>
 
-        <!-- Transaction Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Transaction List -->
-            <div class="lg:col-span-2">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Recent Transactions</h2>
-                    <button id="add-transaction-btn" class="btn-primary flex items-center">
-                        <i class="fas fa-plus mr-2"></i> Add Transaction
-                    </button>
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <!-- This Month Income -->
+                <div class="card p-6 income-bg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">This Month Income</p>
+                            <p class="text-2xl font-bold income-text mt-2" id="month-income">₹0.00</p>
+                            <p class="text-xs text-gray-500 mt-1">From <span id="month-income-count">0</span> deposits</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-full">
+                            <i class="fas fa-arrow-down text-xl income-text"></i>
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Transaction Filters -->
-                <div class="flex space-x-4 mb-6">
-                    <button class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-medium filter-btn active" data-filter="all">All</button>
-                    <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium filter-btn" data-filter="income">Income</button>
-                    <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium filter-btn" data-filter="expense">Expense</button>
+                <!-- This Month Expenses -->
+                <div class="card p-6 expense-bg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">This Month Expenses</p>
+                            <p class="text-2xl font-bold expense-text mt-2" id="month-expense">₹0.00</p>
+                            <p class="text-xs text-gray-500 mt-1">From <span id="month-expense-count">0</span> expenses</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-full">
+                            <i class="fas fa-arrow-up text-xl expense-text"></i>
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Transaction List Container -->
+                <!-- This Week Income -->
                 <div class="card p-6 bg-white">
-                    <div id="transaction-list" class="space-y-4">
-                        <!-- Transactions will be loaded here -->
-                        <div class="text-center py-10 text-gray-500" id="empty-state">
-                            <i class="fas fa-receipt text-4xl mb-4"></i>
-                            <p class="text-lg">No transactions yet</p>
-                            <p class="text-sm mt-1">Add your first transaction using the "+" button</p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">This Week Income</p>
+                            <p class="text-2xl font-bold income-text mt-2" id="week-income">₹0.00</p>
+                            <p class="text-xs text-gray-500 mt-1">Last 7 days</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-full">
+                            <i class="fas fa-calendar-week text-xl text-blue-500"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- This Week Expenses -->
+                <div class="card p-6 bg-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">This Week Expenses</p>
+                            <p class="text-2xl font-bold expense-text mt-2" id="week-expense">₹0.00</p>
+                            <p class="text-xs text-gray-500 mt-1">Last 7 days</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-full">
+                            <i class="fas fa-calendar-week text-xl text-blue-500"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Stats & Insights -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Monthly Insights</h2>
-                <div class="card p-6 bg-white mb-6">
-                    <h3 class="font-bold text-gray-700 mb-4">Spending by Category</h3>
-                    <div id="category-chart" class="space-y-4">
-                        <!-- Category breakdown will be loaded here -->
-                        <div class="text-center py-6 text-gray-500">
-                            <p>No spending data available</p>
-                            <p class="text-sm mt-1">Add expenses to see category breakdown</p>
+
+            <!-- Transaction Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Transaction List -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Recent Transactions</h2>
+                        <button id="add-transaction-btn" class="btn-primary flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Transaction
+                        </button>
+                    </div>
+                    
+                    <!-- Transaction Filters -->
+                    <div class="flex space-x-4 mb-6">
+                        <button class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-medium filter-btn active" data-filter="all">All</button>
+                        <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium filter-btn" data-filter="income">Income</button>
+                        <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium filter-btn" data-filter="expense">Expense</button>
+                    </div>
+                    
+                    <!-- Transaction List Container -->
+                    <div class="card p-6 bg-white">
+                        <div id="transaction-list" class="space-y-4">
+                            <!-- Transactions will be loaded here -->
+                            <div class="text-center py-10 text-gray-500" id="empty-state">
+                                <i class="fas fa-receipt text-4xl mb-4"></i>
+                                <p class="text-lg">No transactions yet</p>
+                                <p class="text-sm mt-1">Add your first transaction using the "+" button</p>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="card p-6 bg-white">
-                    <h3 class="font-bold text-gray-700 mb-4">Quick Stats</h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Daily Average</span>
-                            <span class="font-medium expense-text" id="daily-average">₹0.00</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Highest Expense</span>
-                            <span class="font-medium expense-text" id="highest-expense">₹0.00</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Highest Income</span>
-                            <span class="font-medium income-text" id="highest-income">₹0.00</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Transactions</span>
-                            <span class="font-medium text-gray-800" id="total-transactions">0</span>
+                <!-- Stats & Insights -->
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Monthly Insights</h2>
+                    <div class="card p-6 bg-white mb-6">
+                        <h3 class="font-bold text-gray-700 mb-4">Spending by Category</h3>
+                        <div id="category-chart" class="space-y-4">
+                            <!-- Category breakdown will be loaded here -->
+                            <div class="text-center py-6 text-gray-500">
+                                <p>No spending data available</p>
+                                <p class="text-sm mt-1">Add expenses to see category breakdown</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Data File Info -->
-                <div class="card p-6 bg-white mt-6">
-                    <h3 class="font-bold text-gray-700 mb-4">Data Storage</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Data File</span>
-                            <span class="font-medium text-blue-600">Local Storage</span>
+                    
+                    <div class="card p-6 bg-white">
+                        <h3 class="font-bold text-gray-700 mb-4">Quick Stats</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Daily Average</span>
+                                <span class="font-medium expense-text" id="daily-average">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Highest Expense</span>
+                                <span class="font-medium expense-text" id="highest-expense">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Highest Income</span>
+                                <span class="font-medium income-text" id="highest-income">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Transactions</span>
+                                <span class="font-medium text-gray-800" id="total-transactions">0</span>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Last Updated</span>
-                            <span class="font-medium text-gray-800" id="last-updated">Just now</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Currency</span>
-                            <span class="font-medium text-green-600">INR (₹)</span>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-gray-200">
-                            <p class="text-sm text-gray-500">Data is automatically saved to browser's local storage. Use Export/Import to backup your data.</p>
+                    </div>
+                    
+                    <!-- Data File Info -->
+                    <div class="card p-6 bg-white mt-6">
+                        <h3 class="font-bold text-gray-700 mb-4">Account Info</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Logged in as</span>
+                                <span class="font-medium text-blue-600" id="account-name">User 1</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Last Login</span>
+                                <span class="font-medium text-gray-800" id="last-login">Just now</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Data Privacy</span>
+                                <span class="font-medium text-green-600">User-Specific</span>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <p class="text-sm text-gray-500">Your expense data is completely separate from other users. Use Export/Import to backup your data.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -452,6 +586,60 @@
         </div>
     </div>
 
+    <!-- Change Password Modal -->
+    <div id="password-modal" class="modal">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Change Password</h3>
+                    <button id="close-password-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="password-form">
+                    <div class="mb-4">
+                        <label for="current-password" class="block text-gray-700 text-sm font-medium mb-2">Current Password</label>
+                        <div class="relative">
+                            <input type="password" id="current-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none pr-10" placeholder="Enter current password" required>
+                            <span class="password-toggle toggle-current-password">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="new-password" class="block text-gray-700 text-sm font-medium mb-2">New Password</label>
+                        <div class="relative">
+                            <input type="password" id="new-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none pr-10" placeholder="Enter new password" required minlength="6">
+                            <span class="password-toggle toggle-new-password">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Must be at least 6 characters long</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="confirm-password" class="block text-gray-700 text-sm font-medium mb-2">Confirm New Password</label>
+                        <div class="relative">
+                            <input type="password" id="confirm-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none pr-10" placeholder="Confirm new password" required>
+                            <span class="password-toggle toggle-confirm-password">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-password" class="px-5 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+                        <button type="submit" id="save-password" class="px-5 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">
+                            Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Import Data Modal -->
     <div id="import-modal" class="modal">
         <div class="modal-content">
@@ -471,7 +659,7 @@
                 <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p class="text-yellow-700 text-sm">
                         <i class="fas fa-exclamation-triangle mr-2"></i>
-                        Importing data will replace all existing transactions. Make sure to export your current data first if needed.
+                        Importing data will replace all existing transactions for your account only.
                     </p>
                 </div>
                 
@@ -485,18 +673,155 @@
         </div>
     </div>
 
-    <!-- Data Management Script (Inline instead of separate file for GitHub Pages) -->
+    <!-- User and Data Management Script -->
     <script>
-        // Data Manager - Handles all data operations
-        class DataManager {
+        // User Management System
+        class UserManager {
             constructor() {
-                this.STORAGE_KEY = 'expense_tracker_data_v2';
-                this.CURRENCY = 'INR';
+                this.USERS_KEY = 'expense_tracker_users_v2';
+                this.CURRENT_USER_KEY = 'expense_tracker_current_user';
                 this.init();
             }
             
             init() {
-                // Initialize with sample data if no data exists
+                // Initialize with default users if no users exist
+                if (!this.loadUsers()) {
+                    const defaultUsers = {
+                        'user1': {
+                            username: 'user1',
+                            password: 'password123', // Will be hashed in production
+                            displayName: 'User 1',
+                            color: 'blue',
+                            lastLogin: null,
+                            created: new Date().toISOString()
+                        },
+                        'user2': {
+                            username: 'user2',
+                            password: 'password123', // Will be hashed in production
+                            displayName: 'User 2',
+                            color: 'purple',
+                            lastLogin: null,
+                            created: new Date().toISOString()
+                        }
+                    };
+                    this.saveUsers(defaultUsers);
+                }
+            }
+            
+            loadUsers() {
+                try {
+                    const users = localStorage.getItem(this.USERS_KEY);
+                    return users ? JSON.parse(users) : null;
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                    return null;
+                }
+            }
+            
+            saveUsers(users) {
+                try {
+                    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+                    return true;
+                } catch (error) {
+                    console.error('Error saving users:', error);
+                    return false;
+                }
+            }
+            
+            validateLogin(username, password) {
+                const users = this.loadUsers();
+                if (!users || !users[username]) {
+                    return { success: false, message: 'User not found' };
+                }
+                
+                // In a real app, you would hash and compare passwords securely
+                // For this demo, we're doing simple comparison
+                if (users[username].password === password) {
+                    // Update last login
+                    users[username].lastLogin = new Date().toISOString();
+                    this.saveUsers(users);
+                    
+                    // Set current user
+                    this.setCurrentUser(username);
+                    
+                    return { success: true, user: users[username] };
+                } else {
+                    return { success: false, message: 'Incorrect password' };
+                }
+            }
+            
+            setCurrentUser(username) {
+                localStorage.setItem(this.CURRENT_USER_KEY, username);
+            }
+            
+            getCurrentUser() {
+                const username = localStorage.getItem(this.CURRENT_USER_KEY);
+                if (!username) return null;
+                
+                const users = this.loadUsers();
+                return users ? users[username] : null;
+            }
+            
+            logout() {
+                localStorage.removeItem(this.CURRENT_USER_KEY);
+            }
+            
+            changePassword(username, currentPassword, newPassword) {
+                const users = this.loadUsers();
+                if (!users || !users[username]) {
+                    return { success: false, message: 'User not found' };
+                }
+                
+                // Verify current password
+                if (users[username].password !== currentPassword) {
+                    return { success: false, message: 'Current password is incorrect' };
+                }
+                
+                // Update password
+                users[username].password = newPassword;
+                this.saveUsers(users);
+                
+                return { success: true, message: 'Password changed successfully' };
+            }
+            
+            getUserDataKey(username) {
+                return `expense_tracker_data_${username}`;
+            }
+            
+            getUserTransactions(username) {
+                const dataKey = this.getUserDataKey(username);
+                try {
+                    const data = localStorage.getItem(dataKey);
+                    return data ? JSON.parse(data) : null;
+                } catch (error) {
+                    console.error('Error loading user transactions:', error);
+                    return null;
+                }
+            }
+            
+            saveUserTransactions(username, data) {
+                const dataKey = this.getUserDataKey(username);
+                try {
+                    data.lastUpdated = new Date().toISOString();
+                    localStorage.setItem(dataKey, JSON.stringify(data));
+                    return true;
+                } catch (error) {
+                    console.error('Error saving user transactions:', error);
+                    return false;
+                }
+            }
+        }
+
+        // Data Manager for each user
+        class UserDataManager {
+            constructor(username) {
+                this.username = username;
+                this.userManager = new UserManager();
+                this.init();
+            }
+            
+            init() {
+                // Initialize with sample data if no data exists for this user
                 if (!this.loadFromStorage()) {
                     const sampleData = {
                         transactions: [
@@ -543,32 +868,18 @@
                         ],
                         nextId: 6,
                         lastUpdated: new Date().toISOString(),
-                        currency: this.CURRENCY
+                        currency: 'INR'
                     };
                     this.saveToStorage(sampleData);
                 }
             }
             
             loadFromStorage() {
-                try {
-                    const data = localStorage.getItem(this.STORAGE_KEY);
-                    return data ? JSON.parse(data) : null;
-                } catch (error) {
-                    console.error('Error loading data from storage:', error);
-                    return null;
-                }
+                return this.userManager.getUserTransactions(this.username);
             }
             
             saveToStorage(data) {
-                try {
-                    data.lastUpdated = new Date().toISOString();
-                    data.currency = this.CURRENCY;
-                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-                    return true;
-                } catch (error) {
-                    console.error('Error saving data to storage:', error);
-                    return false;
-                }
+                return this.userManager.saveUserTransactions(this.username, data);
             }
             
             getAllTransactions() {
@@ -675,7 +986,7 @@
                 
                 newData.nextId = maxId + 1;
                 newData.lastUpdated = new Date().toISOString();
-                newData.currency = this.CURRENCY;
+                newData.currency = 'INR';
                 
                 const success = this.saveToStorage(newData);
                 
@@ -691,22 +1002,13 @@
                 const data = this.loadFromStorage();
                 return data ? data.lastUpdated : new Date().toISOString();
             }
-            
-            clearAllData() {
-                localStorage.removeItem(this.STORAGE_KEY);
-                this.init();
-                document.dispatchEvent(new CustomEvent('dataChanged'));
-                return true;
-            }
         }
 
-        // Initialize Data Manager
-        const dataManager = new DataManager();
-        
-        // Main application
+        // Main Application
         class ExpenseTracker {
             constructor() {
-                this.dataManager = dataManager;
+                this.userManager = new UserManager();
+                this.dataManager = null;
                 this.currentFilter = 'all';
                 this.currentDate = new Date();
                 this.init();
@@ -714,16 +1016,152 @@
             
             init() {
                 this.setupEventListeners();
-                this.updateDate();
-                this.updateUI();
-                
-                // Listen for data change events
-                document.addEventListener('dataChanged', () => {
-                    this.handleDataChange();
-                });
+                this.checkLoginStatus();
             }
             
             setupEventListeners() {
+                // Login screen events
+                document.querySelectorAll('.user-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.selectUser(option);
+                    });
+                });
+                
+                document.getElementById('toggle-password').addEventListener('click', () => {
+                    this.togglePasswordVisibility('password', 'toggle-password');
+                });
+                
+                document.getElementById('login-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.login();
+                });
+                
+                // Password toggle in modals
+                document.querySelectorAll('.password-toggle').forEach(toggle => {
+                    if (toggle.classList.contains('toggle-current-password')) {
+                        toggle.addEventListener('click', () => {
+                            this.togglePasswordVisibility('current-password', 'toggle-current-password');
+                        });
+                    } else if (toggle.classList.contains('toggle-new-password')) {
+                        toggle.addEventListener('click', () => {
+                            this.togglePasswordVisibility('new-password', 'toggle-new-password');
+                        });
+                    } else if (toggle.classList.contains('toggle-confirm-password')) {
+                        toggle.addEventListener('click', () => {
+                            this.togglePasswordVisibility('confirm-password', 'toggle-confirm-password');
+                        });
+                    }
+                });
+            }
+            
+            checkLoginStatus() {
+                const currentUser = this.userManager.getCurrentUser();
+                if (currentUser) {
+                    // User is already logged in
+                    this.initializeApp(currentUser);
+                } else {
+                    // Show login screen
+                    this.showLoginScreen();
+                }
+            }
+            
+            showLoginScreen() {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+                
+                // Select first user by default
+                const firstUser = document.querySelector('.user-option');
+                if (firstUser) {
+                    this.selectUser(firstUser);
+                }
+            }
+            
+            showMainApp() {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                this.updateDate();
+                this.updateUI();
+            }
+            
+            selectUser(userElement) {
+                // Remove active class from all options
+                document.querySelectorAll('.user-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Add active class to selected option
+                userElement.classList.add('active');
+                
+                // Update form with selected user
+                const username = userElement.dataset.user;
+                document.getElementById('username').value = username;
+                
+                // Show default password hint
+                const defaultPassword = document.getElementById('default-password');
+                if (defaultPassword) {
+                    defaultPassword.textContent = 'password123';
+                }
+            }
+            
+            togglePasswordVisibility(passwordFieldId, toggleIconId) {
+                const passwordField = document.getElementById(passwordFieldId);
+                const toggleIcon = document.getElementById(toggleIconId) || 
+                                  document.querySelector(`.${toggleIconId}`);
+                
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    toggleIcon.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    passwordField.type = 'password';
+                    toggleIcon.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            }
+            
+            login() {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (!username || !password) {
+                    this.showNotification('Please enter username and password', 'red');
+                    return;
+                }
+                
+                const result = this.userManager.validateLogin(username, password);
+                if (result.success) {
+                    this.initializeApp(result.user);
+                } else {
+                    this.showNotification(result.message, 'red');
+                }
+            }
+            
+            initializeApp(user) {
+                // Initialize data manager for this user
+                this.dataManager = new UserDataManager(user.username);
+                this.currentUser = user;
+                
+                // Update UI with user info
+                document.getElementById('current-user').textContent = user.displayName;
+                document.getElementById('account-name').textContent = user.displayName;
+                
+                // Update user badge color
+                const userBadge = document.getElementById('user-badge');
+                userBadge.style.background = user.color === 'blue' 
+                    ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+                    : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+                
+                // Update last login time
+                this.updateLastLoginTime();
+                
+                // Set up app event listeners
+                this.setupAppEventListeners();
+                
+                // Show main app
+                this.showMainApp();
+                
+                this.showNotification(`Welcome back, ${user.displayName}!`, 'green');
+            }
+            
+            setupAppEventListeners() {
                 // Add transaction button
                 document.getElementById('add-transaction-btn').addEventListener('click', () => {
                     this.openModal();
@@ -741,7 +1179,7 @@
                 // Transaction type selection
                 document.querySelectorAll('.type-option').forEach(option => {
                     option.addEventListener('click', () => {
-                        this.selectType(option);
+                        this.selectTransactionType(option);
                     });
                 });
                 
@@ -758,9 +1196,23 @@
                     });
                 });
                 
-                // Refresh button
-                document.getElementById('refresh-data').addEventListener('click', () => {
-                    this.refreshData();
+                // Change password button
+                document.getElementById('change-password-btn').addEventListener('click', () => {
+                    this.openPasswordModal();
+                });
+                
+                // Password modal events
+                document.getElementById('close-password-modal').addEventListener('click', () => {
+                    this.closePasswordModal();
+                });
+                
+                document.getElementById('cancel-password').addEventListener('click', () => {
+                    this.closePasswordModal();
+                });
+                
+                document.getElementById('password-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.changePassword();
                 });
                 
                 // Export button
@@ -773,7 +1225,7 @@
                     this.openImportModal();
                 });
                 
-                // Import modal buttons
+                // Import modal events
                 document.getElementById('close-import-modal').addEventListener('click', () => {
                     this.closeImportModal();
                 });
@@ -784,6 +1236,16 @@
                 
                 document.getElementById('confirm-import').addEventListener('click', () => {
                     this.importData();
+                });
+                
+                // Logout button
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    this.logout();
+                });
+                
+                // Listen for data change events
+                document.addEventListener('dataChanged', () => {
+                    this.handleDataChange();
                 });
             }
             
@@ -796,6 +1258,28 @@
                 };
                 document.getElementById('current-date').textContent = 
                     this.currentDate.toLocaleDateString('en-US', options);
+            }
+            
+            updateLastLoginTime() {
+                const lastLogin = this.currentUser.lastLogin ? new Date(this.currentUser.lastLogin) : new Date();
+                const now = new Date();
+                const diffMs = now - lastLogin;
+                const diffMins = Math.floor(diffMs / 60000);
+                
+                let timeString;
+                if (diffMins < 1) {
+                    timeString = 'Just now';
+                } else if (diffMins < 60) {
+                    timeString = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+                } else if (diffMins < 1440) {
+                    const diffHours = Math.floor(diffMins / 60);
+                    timeString = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                } else {
+                    const diffDays = Math.floor(diffMins / 1440);
+                    timeString = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                }
+                
+                document.getElementById('last-login').textContent = timeString;
             }
             
             setFilter(filter) {
@@ -833,7 +1317,7 @@
                         document.getElementById('date').value = transaction.date;
                         
                         // Set transaction type
-                        this.selectType(
+                        this.selectTransactionType(
                             transaction.type === 'income' 
                                 ? document.querySelector('.type-income') 
                                 : document.querySelector('.type-expense')
@@ -847,7 +1331,7 @@
                     document.getElementById('date').value = new Date().toISOString().split('T')[0];
                     
                     // Default to income
-                    this.selectType(document.querySelector('.type-income'));
+                    this.selectTransactionType(document.querySelector('.type-income'));
                 }
                 
                 modal.style.display = 'flex';
@@ -855,6 +1339,16 @@
             
             closeModal() {
                 document.getElementById('transaction-modal').style.display = 'none';
+            }
+            
+            openPasswordModal() {
+                document.getElementById('password-modal').style.display = 'flex';
+                document.getElementById('current-password').focus();
+            }
+            
+            closePasswordModal() {
+                document.getElementById('password-modal').style.display = 'none';
+                document.getElementById('password-form').reset();
             }
             
             openImportModal() {
@@ -866,7 +1360,7 @@
                 document.getElementById('import-file').value = '';
             }
             
-            selectType(selectedOption) {
+            selectTransactionType(selectedOption) {
                 // Reset all options
                 document.querySelectorAll('.type-option').forEach(option => {
                     option.classList.remove('selected', 'type-income', 'type-expense');
@@ -882,7 +1376,7 @@
                 }
             }
             
-            getSelectedType() {
+            getSelectedTransactionType() {
                 const selected = document.querySelector('.type-option.selected');
                 return selected ? selected.dataset.type : 'income';
             }
@@ -898,7 +1392,7 @@
                 const description = document.getElementById('description').value.trim();
                 const category = document.getElementById('category').value;
                 const date = document.getElementById('date').value;
-                const type = this.getSelectedType();
+                const type = this.getSelectedTransactionType();
                 
                 const transaction = {
                     type,
@@ -925,14 +1419,38 @@
                 }
             }
             
-            refreshData() {
-                this.showLoadingSpinner();
-                // Simulate data refresh
-                setTimeout(() => {
-                    this.updateUI();
-                    this.hideLoadingSpinner();
-                    this.showNotification('Data refreshed successfully!', 'green');
-                }, 500);
+            changePassword() {
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    this.showNotification('Please fill in all password fields', 'red');
+                    return;
+                }
+                
+                if (newPassword.length < 6) {
+                    this.showNotification('New password must be at least 6 characters', 'red');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    this.showNotification('New passwords do not match', 'red');
+                    return;
+                }
+                
+                const result = this.userManager.changePassword(
+                    this.currentUser.username, 
+                    currentPassword, 
+                    newPassword
+                );
+                
+                if (result.success) {
+                    this.closePasswordModal();
+                    this.showNotification('Password changed successfully!', 'green');
+                } else {
+                    this.showNotification(result.message, 'red');
+                }
             }
             
             exportData() {
@@ -943,7 +1461,7 @@
                 
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'expense-data.json';
+                link.download = `expense-data-${this.currentUser.username}.json`;
                 link.click();
                 
                 URL.revokeObjectURL(url);
@@ -955,7 +1473,7 @@
                 const file = fileInput.files[0];
                 
                 if (!file) {
-                    alert('Please select a file to import.');
+                    this.showNotification('Please select a file to import.', 'red');
                     return;
                 }
                 
@@ -967,11 +1485,19 @@
                         this.closeImportModal();
                         this.showNotification('Data imported successfully!', 'green');
                     } catch (error) {
-                        alert('Invalid JSON file. Please select a valid expense data file.');
+                        this.showNotification('Invalid JSON file. Please select a valid expense data file.', 'red');
                         console.error('Import error:', error);
                     }
                 };
                 reader.readAsText(file);
+            }
+            
+            logout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    this.userManager.logout();
+                    this.showLoginScreen();
+                    this.showNotification('Logged out successfully', 'green');
+                }
             }
             
             formatCurrency(amount) {
@@ -1012,17 +1538,13 @@
                 this.renderTransactions();
                 this.updateSummary();
                 this.updateStats();
-                this.updateLastUpdated();
             }
             
             renderTransactions() {
                 const container = document.getElementById('transaction-list');
                 const emptyState = document.getElementById('empty-state');
                 
-                if (!container) {
-                    console.error('Transaction list container not found');
-                    return;
-                }
+                if (!container) return;
                 
                 let transactions = this.dataManager.getAllTransactions();
                 
@@ -1226,25 +1748,6 @@
                 });
             }
             
-            updateLastUpdated() {
-                const lastUpdated = new Date(this.dataManager.getLastUpdated());
-                const now = new Date();
-                const diffMs = now - lastUpdated;
-                const diffMins = Math.floor(diffMs / 60000);
-                
-                let timeString;
-                if (diffMins < 1) {
-                    timeString = 'Just now';
-                } else if (diffMins < 60) {
-                    timeString = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-                } else {
-                    const diffHours = Math.floor(diffMins / 60);
-                    timeString = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-                }
-                
-                document.getElementById('last-updated').textContent = timeString;
-            }
-            
             showRefreshNotification() {
                 const notification = document.getElementById('refresh-notification');
                 if (notification) {
@@ -1287,34 +1790,23 @@
                     }, 300);
                 }, 3000);
                 
-                // Add slideOut animation
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes slideOut {
-                        from {
-                            transform: translateX(0);
-                            opacity: 1;
+                // Add slideOut animation if not already present
+                if (!document.querySelector('style[data-animation="slideOut"]')) {
+                    const style = document.createElement('style');
+                    style.setAttribute('data-animation', 'slideOut');
+                    style.textContent = `
+                        @keyframes slideOut {
+                            from {
+                                transform: translateX(0);
+                                opacity: 1;
+                            }
+                            to {
+                                transform: translateX(100%);
+                                opacity: 0;
+                            }
                         }
-                        to {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            showLoadingSpinner() {
-                const spinner = document.getElementById('loading-spinner');
-                if (spinner) {
-                    spinner.style.display = 'block';
-                }
-            }
-            
-            hideLoadingSpinner() {
-                const spinner = document.getElementById('loading-spinner');
-                if (spinner) {
-                    spinner.style.display = 'none';
+                    `;
+                    document.head.appendChild(style);
                 }
             }
         }
@@ -1325,9 +1817,8 @@
             
             // Make app available globally for debugging
             window.expenseTracker = app;
-            window.dataManager = dataManager;
             
-            console.log('Expense Tracker initialized with INR currency');
+            console.log('Multi-User Expense Tracker initialized');
         });
     </script>
 </body>
